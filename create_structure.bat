@@ -1,41 +1,64 @@
 @echo off
 
 REM Root directory
-@REM set ROOT=log_pattern_detection_tool
+@REM set ROOT=online_judge_system
 set ROOT=.
 
 REM Create directories if they do not exist
 call :create_folder "%ROOT%"
-call :create_folder "%ROOT%\bin"
 call :create_folder "%ROOT%\config"
 call :create_folder "%ROOT%\docs"
+call :create_folder "%ROOT%\examples"
 call :create_folder "%ROOT%\logs"
-call :create_folder "%ROOT%\src"
+call :create_folder "%ROOT%\online_judge"
 call :create_folder "%ROOT%\tests"
+call :create_folder "%ROOT%\online_judge\core"
+call :create_folder "%ROOT%\online_judge\exceptions"
+call :create_folder "%ROOT%\online_judge\models"
+call :create_folder "%ROOT%\online_judge\storage"
+call :create_folder "%ROOT%\online_judge\utils"
 
 REM Create files only if they do not exist
 REM Python source files (with header)
+call :create_py_file "%ROOT%\main.py"
 call :create_py_file "%ROOT%\setup.py"
 
-call :create_py_file "%ROOT%\bin\run_detection.py"
-
+call :create_py_file "%ROOT%\config\__init__.py"
 call :create_py_file "%ROOT%\config\config.py"
 
-call :create_py_file "%ROOT%\src\__init__.py"
-call :create_py_file "%ROOT%\src\log_reader.py"
-call :create_py_file "%ROOT%\src\pattern_detector.py"
-call :create_py_file "%ROOT%\src\anomaly_detector.py"
-call :create_py_file "%ROOT%\src\storage.py"
-call :create_py_file "%ROOT%\src\report.py"
+call :create_folder "%ROOT%\examples\run_basic_submission.py"
+call :create_folder "%ROOT%\examples\run_multiple_tests.py"
+
+call :create_py_file "%ROOT%\online_judge\__init__.py"
+call :create_py_file "%ROOT%\online_judge\core\__init__.py"
+call :create_py_file "%ROOT%\online_judge\core\compiler.py"
+call :create_py_file "%ROOT%\online_judge\core\evaluator.py"
+call :create_py_file "%ROOT%\online_judge\core\sandbox_executor.py"
+call :create_py_file "%ROOT%\online_judge\core\test_runner.py"
+call :create_py_file "%ROOT%\online_judge\core\worker.py"
+call :create_py_file "%ROOT%\online_judge\exceptions\__init__.py"
+call :create_py_file "%ROOT%\online_judge\exceptions\execution_errors.py"
+call :create_py_file "%ROOT%\online_judge\exceptions\sandbox_errors.py"
+call :create_py_file "%ROOT%\online_judge\models\__init__.py"
+call :create_py_file "%ROOT%\online_judge\models\execution_result.py"
+call :create_py_file "%ROOT%\online_judge\models\submission.py"
+call :create_py_file "%ROOT%\online_judge\models\test_case.py"
+call :create_py_file "%ROOT%\online_judge\storage\__init__.py"
+call :create_py_file "%ROOT%\online_judge\storage\submissions.py"
+call :create_py_file "%ROOT%\online_judge\storage\results_db.py"
+call :create_py_file "%ROOT%\online_judge\utils\__init__.py"
+call :create_py_file "%ROOT%\online_judge\utils\file_ops.py"
+call :create_py_file "%ROOT%\online_judge\utils\logging.py"
+call :create_py_file "%ROOT%\online_judge\utils\security.py"
 
 call :create_py_file "%ROOT%\tests\__init__.py"
-call :create_py_file "%ROOT%\tests\test_log_reader.py"
-call :create_py_file "%ROOT%\tests\test_pattern_detector.py"
-call :create_py_file "%ROOT%\tests\test_anomaly_detector.py"
-call :create_py_file "%ROOT%\tests\test_storage.py"
+call :create_py_file "%ROOT%\tests\test_compiler.py"
+call :create_py_file "%ROOT%\tests\test_evaluator.py"
+call :create_py_file "%ROOT%\tests\test_runner.py"
+call :create_py_file "%ROOT%\tests\test_sandbox_executor.py"
 
 REM Non-Python files (empty)
-call :create_file "%ROOT%\logs\tool_execution.log"
+call :create_file "%ROOT%\logs\online_judge.log"
 
 call :create_file "%ROOT%\requirements.txt"
 call :create_file "%ROOT%\README.md"
@@ -79,7 +102,7 @@ echo # -*- Python -*- Compatibility Header
 echo #
 echo # Copyright ^(C^) 2023 Developer Jarvis ^(Pen Name^)
 echo #
-echo # This file is part of the Log Pattern Detection Tool Library. This library is free
+echo # This file is part of the Online Judge System Library. This library is free
 echo # software; you can redistribute it and/or modify it under the
 echo # terms of the GNU General Public License as published by the
 echo # Free Software Foundation; either version 3, or ^(at your option^)
@@ -95,8 +118,8 @@ echo # along with this program. If not, see ^<https://www.gnu.org/licenses/^>.
 echo #
 echo # SPDX-License-Identifier: GPL-3.0-or-later
 echo #
-echo # Log Pattern Detection Tool - Find patterns and anomalies in large log files
-echo #                       Skills: streaming I/O, algorithms, regex
+echo # Online Judge System - Run user-submitted code safely with test cases
+echo #                   Skills: sandboxing, subprocess, security
 echo #
 echo # Author: Developer Jarvis ^(Pen Name^)
 echo # Contact: https://github.com/DeveloperJarvis
