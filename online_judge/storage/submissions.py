@@ -30,8 +30,43 @@
 # --------------------------------------------------
 # submissions MODULE
 # --------------------------------------------------
-
+"""
+In-memory submission storage.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import Dict, List
+from online_judge.models.submission import Submission
+
+
+# --------------------------------------------------
+# submission store
+# --------------------------------------------------
+class SubmissionStore:
+    """
+    Simple in-memory submission store.
+    """
+
+    def __init__(self) -> None:
+        self._submissions: Dict[str, Submission] = {}
+    
+    def save(self, submission: Submission) -> None:
+        """
+        Store a submission.
+        """
+        self._submissions[
+            submission.submission_id] = submission
+    
+    def get(self, submission_id: str) -> Submission:
+        """
+        Retrieve a submission by ID.
+        """
+        return self._submissions[submission_id]
+    
+    def list_all(self) -> List[Submission]:
+        """
+        List all submissions.
+        """
+        return list(self._submissions.values())
 

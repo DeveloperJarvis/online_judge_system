@@ -30,8 +30,38 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Exception hierarchy for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .execution_errors import (
+    OnlineJudgeError,
+    CompilationError,
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+    MemoryLimitExceeded,
+    WrongAnswerError,
+)
 
+from .sandbox_errors import (
+    SandboxError,
+    SandboxViolationError,
+    ForbiddenOperationError,
+    SandboxTimeoutError,
+)
+
+
+__all__ = [
+    "OnlineJudgeError",
+    "CompilationError",
+    "RuntimeExecutionError",
+    "TimeLimitExceeded",
+    "MemoryLimitExceeded",
+    "WrongAnswerError",
+    "SandboxError",
+    "SandboxViolationError",
+    "ForbiddenOperationError",
+    "SandboxTimeoutError",
+]

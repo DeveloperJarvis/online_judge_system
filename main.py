@@ -28,9 +28,80 @@
 # --------------------------------------------------
 
 # --------------------------------------------------
-# <MODULE_NAME> MODULE
+# main MODULE
 # --------------------------------------------------
-
+"""
+CLI Entry point for Online Judge System
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import argparse
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Online Judge System CLI",
+    )
+    parser.add_argument(
+        "--language",
+        type=str,
+        default="python",
+        help="Programming language of the submission",
+    )
+    parser.add_argument(
+        "--file",
+        type=str,
+        required=True,
+        help="Path to the code file to submit",
+    )
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=None,
+        help="Input data for the program (optional)",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=3,
+        help="Execution timeout in seconds",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    # Read user-submitted code
+    with open(args.file, "r", encoding="utf-8") as f:
+        code = f.read()
+
+    test_case = JudgeTestCase(
+        input_data=args.input or "",
+        expected_output=None    # Optional, for CLI run
+    )
+
+    submission = Submission(
+        code=code,
+        language=args.language,
+        problem_id="cli",
+        test_cases=[test_case],
+        time_limit=args.timeout,
+    )
+
+    executor = Worker()
+    results = executor.process(submission)
+
+    for idx, result in enumerate(results):
+        print(f"Test #{idx+1}")
+        print(f" Passed: {result.passed}")
+        print(f" Output: {result.actual_output}")
+        print(f" Error: {result.error}")
+
+
+if __name__ == "__main__":
+    main()

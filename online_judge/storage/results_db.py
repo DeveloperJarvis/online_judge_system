@@ -30,8 +30,50 @@
 # --------------------------------------------------
 # results_db MODULE
 # --------------------------------------------------
-
+"""
+Execution results storage.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import Dict, List
+from online_judge.models.execution_result import ExecutionResult
 
+
+# --------------------------------------------------
+# results DB
+# --------------------------------------------------
+class ResultsDB:
+    """
+    In-memory storage for execution results.
+    """
+
+    def __init__(self) -> None:
+        self._results: Dict[str, List[ExecutionResult]] = {}
+    
+    def save(
+        self,
+        submission_id: str,
+        result: ExecutionResult,
+    ) -> None:
+        """
+        Save result for a submission.
+        """
+        self._results.setdefault(
+            submission_id, []
+        ).append(result)
+    
+    def get_results(
+            self,
+            submission_id: str,
+        ) -> List[ExecutionResult]:
+        """
+        Get all results for a submission.
+        """
+        return self._results.get(submission_id, [])
+    
+    def clear(self) -> None:
+        """
+        Clear all stored results.
+        """
+        self._results.clear()

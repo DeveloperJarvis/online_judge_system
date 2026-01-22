@@ -30,8 +30,49 @@
 # --------------------------------------------------
 # sandbox_errors MODULE
 # --------------------------------------------------
-
+"""
+Sandbox and security related errors.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
 
+
+# --------------------------------------------------
+# sandbox error
+# --------------------------------------------------
+class SandboxError(Exception):
+    """
+    Base class for sandbox-related errors.
+    """
+    pass
+
+
+# --------------------------------------------------
+# sandbox violation error
+# --------------------------------------------------
+class SandboxViolationError(SandboxError):
+    """
+    Raised when code attempts prohibited action.
+    """
+    pass
+
+
+# --------------------------------------------------
+# forbidden operation error
+# --------------------------------------------------
+class ForbiddenOperationError(SandboxViolationError):
+    """
+    Raised for forbidden system calls or file access.
+    """
+    pass
+
+
+# --------------------------------------------------
+# sandbox timeout error
+# --------------------------------------------------
+class SandboxTimeoutError(SandboxError):
+    """
+    Raised when sandbox itself times out.
+    """
+    pass

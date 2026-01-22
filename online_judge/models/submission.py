@@ -30,8 +30,47 @@
 # --------------------------------------------------
 # submission MODULE
 # --------------------------------------------------
-
+"""
+Submission model.
+Represents a user-submitted solution.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from dataclasses import dataclass, field
+from typing import Optional
+import uuid
+import time
+from typing import List
 
+from online_judge.models.test_case import JudgeTestCase
+
+
+# --------------------------------------------------
+# submission
+# --------------------------------------------------
+@dataclass(frozen=True)
+class Submission:
+    """
+    Represents a code submission.
+    """
+    code: str
+    language: str
+    problem_id: str
+    test_cases: List[JudgeTestCase]
+    time_limit: int
+    
+    submission_id: str = field(
+        default_factory=lambda: str(uuid.uuid4())
+    )
+    created_at: float = field(
+        default_factory=time.time
+    )
+    user_id: Optional[str] = None
+
+    def run_command(self, file_path: str) -> list[str]:
+        if self.language == "python":
+            return ["python", file_path]
+        raise ValueError(
+            f"Unsupported langauge: {self.language}"
+        )

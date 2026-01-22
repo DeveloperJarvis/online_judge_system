@@ -28,21 +28,49 @@
 # --------------------------------------------------
 
 # --------------------------------------------------
-# __init__ MODULE
+# run_basic_submission MODULE
 # --------------------------------------------------
 """
-Domain models for Online Judge System.
+Example: Run a basic submission with one test case
 """
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-from .submission import Submission
-from .test_case import JudgeTestCase
-from .execution_result import ExecutionResult
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
 
 
-__all__ = [
-    "Submission",
-    "JudgeTestCase",
-    "ExecutionResult",
-]
+def main():
+    # Sample user code
+    code = """
+x = input()
+print(x[::-1])
+"""
+    # Single test case
+    test_case = JudgeTestCase(
+        input_data="hello",
+        expected_output="olleh",
+    )
+
+    submission = Submission(
+        code=code,
+        language="python",
+        problem_id="reverse_string",
+        test_cases=[test_case],
+        time_limit=2,
+    )
+
+    worker = Worker()
+    results = worker.process(submission)
+
+    for idx, result in enumerate(results):
+        print(f"Test #{idx + 1}")
+        print(f" Passed: {result.passed}")
+        print(f" Output: {result.actual_output}")
+        print(f" Expected: {result.expected_output}")
+        print("-" * 30)
+
+
+if __name__ == "__main__":
+    main()

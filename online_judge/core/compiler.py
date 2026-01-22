@@ -30,8 +30,40 @@
 # --------------------------------------------------
 # compiler MODULE
 # --------------------------------------------------
-
+"""
+Compiler module for Online Judge.
+Handles compilation or syntax validation.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import subprocess
+from online_judge.exceptions.execution_errors import CompilationError
 
+
+# --------------------------------------------------
+# compiler
+# --------------------------------------------------
+class Compiler:
+    """
+    Compiler or validates user-submitted code.
+    """
+
+    def compile(self, source_file: str,
+                language: str) -> None:
+        """
+        Compile source code if required.
+        """
+        if language == "python":
+            # Python: syntax check only
+            result = subprocess.run(
+                ["python", "-m", "py_compile", source_file],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise CompilationError(result.stderr)
+        else:
+            raise CompilationError(
+                f"Unsupported language: {language}"
+            )

@@ -28,10 +28,53 @@
 # --------------------------------------------------
 
 # --------------------------------------------------
-# test_runner MODULE
+# run_multiple_tests MODULE
 # --------------------------------------------------
-
+"""
+Example: Run a submission against multiple test cases
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
 
+
+def main():
+    # Sample user code
+    code = """
+def solve():
+    n = int(input())
+    print(n * n)
+
+solve()
+"""
+
+    test_cases = [
+        JudgeTestCase(input_data="2", expected_output="4"),
+        JudgeTestCase(input_data="5", expected_output="25"),
+        JudgeTestCase(input_data="10", expected_output="100"),
+    ]
+
+    submission = Submission(
+        code=code,
+        language="python",
+        problem_id="square_number",
+        test_cases=test_cases,
+        time_limit=2,
+    )
+
+    worker = Worker()
+    results = worker.process(submission)
+
+    for idx, result in enumerate(results):
+        print(f"Test #{idx+1}")
+        print(f" Input: {result.input_data}")
+        print(f" Output: {result.actual_output}")
+        print(f" Expected: {result.expected_output}")
+        print(f" Passed: {result.passed}")
+
+
+if __name__ == "__main__":
+    main()

@@ -30,8 +30,47 @@
 # --------------------------------------------------
 # logging MODULE
 # --------------------------------------------------
-
+"""
+Logging utilities for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import logging
+import os
+from typing import Dict
+from config.config import LOG_DIR, LOG_FILE
 
+
+_LOGGERS: Dict[str, logging.Logger] = {}
+
+
+def get_logger(name: str) -> logging.Logger:
+    """
+    Get or create a configured logger instance.
+    """
+    if name in _LOGGERS:
+        return _LOGGERS[name]
+    
+    os.makedirs(LOG_DIR, exist_ok=True)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
+    )
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    # File Handler
+    file_handler = logging.FileHandler(LOG_FILE)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    _LOGGERS[name] = logger
+    return logger

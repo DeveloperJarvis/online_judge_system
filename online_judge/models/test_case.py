@@ -30,8 +30,24 @@
 # --------------------------------------------------
 # test_case MODULE
 # --------------------------------------------------
-
+"""
+Test case model.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from dataclasses import dataclass
 
+
+# --------------------------------------------------
+# test case
+# --------------------------------------------------
+@dataclass(frozen=True)
+class JudgeTestCase:
+    """
+    Represents a single test case.
+    """
+    input_data: str
+    expected_output: str
+    time_limit_sec: int = 1
+    memory_limit_mb: int = 128

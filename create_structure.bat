@@ -26,8 +26,8 @@ call :create_py_file "%ROOT%\setup.py"
 call :create_py_file "%ROOT%\config\__init__.py"
 call :create_py_file "%ROOT%\config\config.py"
 
-call :create_folder "%ROOT%\examples\run_basic_submission.py"
-call :create_folder "%ROOT%\examples\run_multiple_tests.py"
+call :create_py_file "%ROOT%\examples\run_basic_submission.py"
+call :create_py_file "%ROOT%\examples\run_multiple_tests.py"
 
 call :create_py_file "%ROOT%\online_judge\__init__.py"
 call :create_py_file "%ROOT%\online_judge\core\__init__.py"
@@ -54,7 +54,7 @@ call :create_py_file "%ROOT%\online_judge\utils\security.py"
 call :create_py_file "%ROOT%\tests\__init__.py"
 call :create_py_file "%ROOT%\tests\test_compiler.py"
 call :create_py_file "%ROOT%\tests\test_evaluator.py"
-call :create_py_file "%ROOT%\tests\test_runner.py"
+call :create_py_file "%ROOT%\tests\test_test_runner.py"
 call :create_py_file "%ROOT%\tests\test_sandbox_executor.py"
 
 REM Non-Python files (empty)

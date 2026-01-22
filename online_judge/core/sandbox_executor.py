@@ -30,8 +30,53 @@
 # --------------------------------------------------
 # sandbox_executor MODULE
 # --------------------------------------------------
-
+"""
+Sandboxed execution using subprocess.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import subprocess
+from typing import Tuple
 
+from online_judge.exceptions.execution_errors import (
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+)
+from online_judge.exceptions.sandbox_errors import SandboxViolationError
+
+
+# --------------------------------------------------
+# sandbox execution
+# --------------------------------------------------
+class SandboxExecutor:
+    """
+    Executes code in restricted environment.
+    """
+
+    def execute(
+        self,
+        command: list[str],
+        input_data: str,
+        time_limit: int,
+    ) -> Tuple[str, str]:
+        """
+        Execute user code safely.
+        """
+        try:
+            process = subprocess.run(
+                command,
+                input=input_data,
+                capture_output=True,
+                text=True,
+                timeout=time_limit,
+            )
+        except subprocess.TimeoutExpired:
+            raise TimeLimitExceeded(
+                "Execution time exceeded"
+            )
+
+        if process.returncode != 0:
+            raise RuntimeExecutionError(process.stderr)
+        
+        return process.stdout, process.stderr

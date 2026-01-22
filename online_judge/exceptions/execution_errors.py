@@ -30,8 +30,69 @@
 # --------------------------------------------------
 # execution_errors MODULE
 # --------------------------------------------------
-
+"""
+Execution-related errors for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
 
+
+# --------------------------------------------------
+# online judge error
+# --------------------------------------------------
+class OnlineJudgeError(Exception):
+    """
+    Base class for all Online Judge Errors.
+    """
+    pass
+
+
+# --------------------------------------------------
+# compilation error
+# --------------------------------------------------
+class CompilationError(OnlineJudgeError):
+    """
+    Raised when user code fails to compile.
+    """
+    pass
+
+
+# --------------------------------------------------
+# runtime execution error
+# --------------------------------------------------
+class RuntimeExecutionError(OnlineJudgeError):
+    """
+    Raised when runtime error occurs during execution.
+    """
+    pass
+
+
+# --------------------------------------------------
+# time limit exceeded
+# --------------------------------------------------
+class TimeLimitExceeded(OnlineJudgeError):
+    """
+    Raised when exectuon exceeds allowed time.
+    """
+    pass
+
+
+# --------------------------------------------------
+# memory limit exceeded
+# --------------------------------------------------
+class MemoryLimitExceeded(OnlineJudgeError):
+    """
+    Raised when execution exceeds memory limit.
+    """
+    pass
+
+
+# --------------------------------------------------
+# wrong answer error
+# --------------------------------------------------
+class WrongAnswerError(OnlineJudgeError):
+    """
+    Raised when execution exceeds memory limit.
+    """
+    pass

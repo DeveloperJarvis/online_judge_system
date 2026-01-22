@@ -34,4 +34,52 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.exceptions.execution_errors import (
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+)
 
+
+def test_sandbox_executor_success(tmp_path):
+    code = "print('ok')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    executor = SandboxExecutor()
+    stdout, stderr = executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=2,
+    )
+
+    assert stdout.strip() == "ok"
+    assert stderr == ""
+
+def test_sandbox_executor_runtime_error(tmp_path):
+    code = "raise ValueError('boom')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    executor = SandboxExecutor()
+    with pytest.raises(RuntimeExecutionError):
+        executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=2,
+    )
+
+
+def test_sandbox_executor_timeout(tmp_path):
+    code = "while True: pass"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    executor = SandboxExecutor()
+    with pytest.raises(TimeLimitExceeded):
+        executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=1,
+    )

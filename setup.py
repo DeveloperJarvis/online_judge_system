@@ -34,4 +34,52 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from setuptools import setup, find_packages
+from pathlib import Path
 
+
+ROOT = Path(__file__).parent
+
+
+setup(
+    name="online-judge-system",
+    version="0.1.0",
+    description="Run user-submitted code safety with test cases",
+    long_description=(ROOT / "README.md").read_text(
+        encoding="utf-8"
+    ),
+    long_description_content_type="text/markdown",
+    author="Developer Jarvis",
+    author_email="developerjarvis@github.com",
+    url="https://github.com/DeveloperJarvis/online_judge_system",
+    license="GPL-3.0-or-later",
+    packages=find_packages(
+        exclude=["tests*", "examples*", "logs*"]
+    ),
+    python_requires=">=3.9",
+    install_requires=[
+        "typing-extensions>=4.0.0"
+    ],
+    extras_require={
+        "dev": [
+            "pytest",
+            "black",
+            "flake8",
+            "mypy",
+        ]
+    },
+    entry_points={
+        "console_scripts": [
+            "online-judge=main:main"
+        ]
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 or later",
+        "Operating System :: OS Independent",
+        "Topic :: Education",
+        "Topic :: Software Development :: Libraries",
+    ],
+    include_package_data=True,
+    zip_safe=False,
+)

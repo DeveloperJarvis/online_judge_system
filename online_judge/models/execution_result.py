@@ -30,8 +30,28 @@
 # --------------------------------------------------
 # execution_result MODULE
 # --------------------------------------------------
-
+"""
+Execution result model.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from dataclasses import dataclass
+from typing import Optional
 
+
+# --------------------------------------------------
+# execution result
+# --------------------------------------------------
+@dataclass(frozen=True)
+class ExecutionResult:
+    """
+    Result of executing code against a test case.
+    """
+    passed: bool
+    actual_output: str
+    input_data: str
+    expected_output: str
+    execution_time: float = 0.0
+    memory_used_mb: int = 0
+    error: Optional[str] = None

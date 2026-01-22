@@ -30,8 +30,43 @@
 # --------------------------------------------------
 # file_ops MODULE
 # --------------------------------------------------
-
+"""
+Filesystem utilities for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import os
+import shutil
+import tempfile
+from typing import Optional
 
+
+def create_temp_dir(prefix: str = "oj_") -> str:
+    """
+    Create a secure temporary directory for execution.
+    """
+    return tempfile.mkdtemp(prefix=prefix)
+
+
+def write_code_file(
+        directory: str,
+        filename: str,
+        code: str,
+        encoding: str = "utf-8",
+    ) -> str:
+    """
+    Write submitted code to a file inside a sandbox directory.
+    """
+    path = os.path.join(directory, filename)
+    with open(path, "w", encoding=encoding) as f:
+        f.write(code)
+    return path
+
+
+def cleanup_dir(path: str) -> None:
+    """
+    Safely remove a directory and all its contents.
+    """
+    if path and os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)

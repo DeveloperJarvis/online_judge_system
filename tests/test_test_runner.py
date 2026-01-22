@@ -28,21 +28,39 @@
 # --------------------------------------------------
 
 # --------------------------------------------------
-# __init__ MODULE
+# test_test_runner MODULE
 # --------------------------------------------------
-"""
-Domain models for Online Judge System.
-"""
+
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
-from .submission import Submission
-from .test_case import JudgeTestCase
-from .execution_result import ExecutionResult
+import pytest
+from online_judge.core.test_runner import CaseRunner
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.models.test_case import JudgeTestCase
 
 
-__all__ = [
-    "Submission",
-    "JudgeTestCase",
-    "ExecutionResult",
-]
+def test_test_runner_single_case(tmp_path):
+    code = "print(input())"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    executor = SandboxExecutor()
+    runner = CaseRunner(executor)
+
+    test_cases = [
+        JudgeTestCase(
+            input_data="hello",
+            expected_output="hello",
+        )
+    ]
+
+    results = runner.run(
+        command=["python", str(file_path)],
+        test_cases=test_cases,
+        time_limit=2,
+    )
+
+    assert len(results) == 1
+    assert results[0].passed is True
+    assert results[0].actual_output == "hello"

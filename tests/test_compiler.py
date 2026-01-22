@@ -34,4 +34,36 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from online_judge.core.compiler import Compiler
+from online_judge.exceptions.execution_errors import CompilationError
 
+
+def test_python_compiler_success(tmp_path):
+    code = "print('hello')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    compiler = Compiler()
+    # should not raise
+    compiler.compile(str(file_path), "python") 
+
+
+def test_python_compiler_syntax_error(tmp_path):
+    code = "print("
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+
+    compiler = Compiler()
+    with pytest.raises(CompilationError):
+        compiler.compile(str(file_path), "python")
+
+
+def test_unsupported_language(tmp_path):
+    code = "int main() {}"
+    file_path = tmp_path / "solution.c"
+    file_path.write_text(code)
+
+    compiler = Compiler()
+    with pytest.raises(CompilationError):
+        compiler.compile(str(file_path), "c")

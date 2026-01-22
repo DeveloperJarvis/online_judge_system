@@ -34,4 +34,34 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from online_judge.core.evaluator import Evaluator
+from online_judge.models.execution_result import ExecutionResult
+from online_judge.exceptions.execution_errors import WrongAnswerError
 
+
+def test_evaluator_all_passed():
+    results = [
+        ExecutionResult(
+            passed=True,
+            actual_output="4",
+            expected_output="4",
+            input_data="2",
+        )
+    ]
+    evaluator = Evaluator()
+    evaluator.evaluate(results) # should not raise
+
+
+def test_evaluator_wrong_answer():
+    results = [
+        ExecutionResult(
+            passed=False,
+            actual_output="3",
+            expected_output="4",
+            input_data="2",
+        )
+    ]
+    evaluator = Evaluator()
+    with pytest.raises(WrongAnswerError):
+        evaluator.evaluate(results)

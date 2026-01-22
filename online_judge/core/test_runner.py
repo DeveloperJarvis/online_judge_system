@@ -30,8 +30,55 @@
 # --------------------------------------------------
 # test_runner MODULE
 # --------------------------------------------------
-
+"""
+Runs submission against multiple test cases.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import List
 
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.models.test_case import JudgeTestCase
+from online_judge.models.execution_result import ExecutionResult
+
+
+# --------------------------------------------------
+# test runner
+# --------------------------------------------------
+class CaseRunner:
+    """
+    Executes test cases sequentially.
+    """
+
+    def __init__(self, executor: SandboxExecutor):
+        self.executor = executor
+    
+    def run(
+        self,
+        command: list[str],
+        test_cases: List[JudgeTestCase],
+        time_limit: int,
+    ) -> List[ExecutionResult]:
+        results: List[ExecutionResult] = []
+
+        for test in test_cases:
+            stdout, stderr = self.executor.execute(
+                command,
+                test.input_data,
+                time_limit,
+            )
+            expected = test.expected_output or ""
+            results.append(
+                ExecutionResult(
+                    input_data=test.input_data,
+                    expected_output=test.expected_output,
+                    actual_output=stdout.strip(),
+                    passed=(
+                True if test.expected_output is None 
+                else stdout.strip() == expected.strip()
+                    ),
+                )
+            )
+    
+        return results

@@ -1,0 +1,985 @@
+# main.py:
+"""
+CLI Entry point for Online Judge System
+"""
+import argparse
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Online Judge System CLI",
+    )
+    parser.add_argument(
+        "--language",
+        type=str,
+        default="python",
+        help="Programming language of the submission",
+    )
+    parser.add_argument(
+        "--file",
+        type=str,
+        required=True,
+        help="Path to the code file to submit",
+    )
+    parser.add_argument(
+        "--input",
+        type=str,
+        default=None,
+        help="Input data for the program (optional)",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=3,
+        help="Execution timeout in seconds",
+    )
+    return parser.parse_args()
+def main():
+    args = parse_args()
+    with open(args.file, "r", encoding="utf-8") as f:
+        code = f.read()
+    test_case = JudgeTestCase(
+        input_data=args.input or "",
+        expected_output=None                           
+    )
+    submission = Submission(
+        code=code,
+        language=args.language,
+        problem_id="cli",
+        test_cases=[test_case],
+        time_limit=args.timeout,
+    )
+    executor = Worker()
+    results = executor.process(submission)
+    for idx, result in enumerate(results):
+        print(f"Test #{idx+1}")
+        print(f" Passed: {result.passed}")
+        print(f" Output: {result.actual_output}")
+        print(f" Error: {result.error}")
+if __name__ == "__main__":
+    main()
+
+
+# setup.py:
+from setuptools import setup, find_packages
+from pathlib import Path
+ROOT = Path(__file__).parent
+setup(
+    name="online-judge-system",
+    version="0.1.0",
+    description="Run user-submitted code safety with test cases",
+    long_description=(ROOT / "README.md").read_text(
+        encoding="utf-8"
+    ),
+    long_description_content_type="text/markdown",
+    author="Developer Jarvis",
+    author_email="developerjarvis@github.com",
+    url="https://github.com/DeveloperJarvis/online_judge_system",
+    license="GPL-3.0-or-later",
+    packages=find_packages(
+        exclude=["tests*", "examples*", "logs*"]
+    ),
+    python_requires=">=3.9",
+    install_requires=[
+        "typing-extensions>=4.0.0"
+    ],
+    extras_require={
+        "dev": [
+            "pytest",
+            "black",
+            "flake8",
+            "mypy",
+        ]
+    },
+    entry_points={
+        "console_scripts": [
+            "online-judge=main:main"
+        ]
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 or later",
+        "Operating System :: OS Independent",
+        "Topic :: Education",
+        "Topic :: Software Development :: Libraries",
+    ],
+    include_package_data=True,
+    zip_safe=False,
+)
+
+
+# config\__init__.py:
+"""
+Config package for Online Judge System
+"""
+from .config import OJConfig
+__all__ = ["OJConfig"]
+
+
+# config\config.py:
+"""
+Configuration module for Online Judge System
+"""
+import os
+from dataclasses import dataclass
+PARENT_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
+LOG_DIR = os.path.join(PARENT_DIR, "logs")
+LOG_FILE = os.path.join(LOG_DIR, "online_judge.log")
+SUBMISSION_DIR = os.path.join(PARENT_DIR, "submissions")
+RESULTS_DIR = os.path.join(PARENT_DIR, "results")
+os.makedirs(LOG_DIR, exist_ok=True)
+os.makedirs(SUBMISSION_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
+@dataclass(frozen=True)
+class OJConfig:
+    """
+    Online Judge System configuration object.
+    """
+    max_execution_time: int = 3                             
+    max_memory_mb: int = 64                         
+    languages_supported: tuple = ("python", "c", "cpp", "java")
+    log_file: str = LOG_FILE
+    submission_dir: str = SUBMISSION_DIR
+    results_dir: str = RESULTS_DIR
+
+
+# examples\run_basic_submission.py:
+"""
+Example: Run a basic submission with one test case
+"""
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
+def main():
+    code = """
+x = input()
+print(x[::-1])
+"""
+    test_case = JudgeTestCase(
+        input_data="hello",
+        expected_output="olleh",
+    )
+    submission = Submission(
+        code=code,
+        language="python",
+        problem_id="reverse_string",
+        test_cases=[test_case],
+        time_limit=2,
+    )
+    worker = Worker()
+    results = worker.process(submission)
+    for idx, result in enumerate(results):
+        print(f"Test #{idx + 1}")
+        print(f" Passed: {result.passed}")
+        print(f" Output: {result.actual_output}")
+        print(f" Expected: {result.expected_output}")
+        print("-" * 30)
+if __name__ == "__main__":
+    main()
+
+
+# examples\run_multiple_tests.py:
+"""
+Example: Run a submission against multiple test cases
+"""
+from online_judge.core.worker import Worker
+from online_judge.models.submission import Submission
+from online_judge.models.test_case import JudgeTestCase
+def main():
+    code = """
+def solve():
+    n = int(input())
+    print(n * n)
+solve()
+"""
+    test_cases = [
+        JudgeTestCase(input_data="2", expected_output="4"),
+        JudgeTestCase(input_data="5", expected_output="25"),
+        JudgeTestCase(input_data="10", expected_output="100"),
+    ]
+    submission = Submission(
+        code=code,
+        language="python",
+        problem_id="square_number",
+        test_cases=test_cases,
+        time_limit=2,
+    )
+    worker = Worker()
+    results = worker.process(submission)
+    for idx, result in enumerate(results):
+        print(f"Test #{idx+1}")
+        print(f" Input: {result.input_data}")
+        print(f" Output: {result.actual_output}")
+        print(f" Expected: {result.expected_output}")
+        print(f" Passed: {result.passed}")
+if __name__ == "__main__":
+    main()
+
+
+# online_judge\__init__.py:
+"""
+Online Judge System package.
+"""
+__version__ = "0.1.0"
+
+
+# online_judge\core\__init__.py:
+"""
+Core execution engine for Online Judge System.
+"""
+from .compiler import Compiler
+from .sandbox_executor import SandboxExecutor
+from .test_runner import CaseRunner
+from .evaluator import Evaluator
+from .worker import Worker
+__all__ = [
+    "Compiler",
+    "SandboxExecutor",
+    "CaseRunner",
+    "Evaluator",
+    "Worker",
+]
+
+
+# online_judge\core\compiler.py:
+"""
+Compiler module for Online Judge.
+Handles compilation or syntax validation.
+"""
+import subprocess
+from online_judge.exceptions.execution_errors import CompilationError
+class Compiler:
+    """
+    Compiler or validates user-submitted code.
+    """
+    def compile(self, source_file: str,
+                language: str) -> None:
+        """
+        Compile source code if required.
+        """
+        if language == "python":
+            result = subprocess.run(
+                ["python", "-m", "py_compile", source_file],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise CompilationError(result.stderr)
+        else:
+            raise CompilationError(
+                f"Unsupported language: {language}"
+            )
+
+
+# online_judge\core\evaluator.py:
+"""
+Evaluates test execution results.
+"""
+from typing import List
+from online_judge.models.execution_result import ExecutionResult
+from online_judge.exceptions.execution_errors import WrongAnswerError
+class Evaluator:
+    """
+    Evaluates correctness of outputs.
+    """
+    def evaluate(self, 
+                 results: List[ExecutionResult]) -> None:
+        """
+        Raise error if any test fails.
+        """
+        for result in results:
+            if not result.passed:
+                raise WrongAnswerError(
+                    f"Expected: {result.expected_output}, "
+                    f"Got: {result.actual_output}"
+                )
+
+
+# online_judge\core\sandbox_executor.py:
+"""
+Sandboxed execution using subprocess.
+"""
+import subprocess
+from typing import Tuple
+from online_judge.exceptions.execution_errors import (
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+)
+from online_judge.exceptions.sandbox_errors import SandboxViolationError
+class SandboxExecutor:
+    """
+    Executes code in restricted environment.
+    """
+    def execute(
+        self,
+        command: list[str],
+        input_data: str,
+        time_limit: int,
+    ) -> Tuple[str, str]:
+        """
+        Execute user code safely.
+        """
+        try:
+            process = subprocess.run(
+                command,
+                input=input_data,
+                capture_output=True,
+                text=True,
+                timeout=time_limit,
+            )
+        except subprocess.TimeoutExpired:
+            raise TimeLimitExceeded(
+                "Execution time exceeded"
+            )
+        if process.returncode != 0:
+            raise RuntimeExecutionError(process.stderr)
+        return process.stdout, process.stderr
+
+
+# online_judge\core\test_runner.py:
+"""
+Runs submission against multiple test cases.
+"""
+from typing import List
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.models.test_case import JudgeTestCase
+from online_judge.models.execution_result import ExecutionResult
+class CaseRunner:
+    """
+    Executes test cases sequentially.
+    """
+    def __init__(self, executor: SandboxExecutor):
+        self.executor = executor
+    def run(
+        self,
+        command: list[str],
+        test_cases: List[JudgeTestCase],
+        time_limit: int,
+    ) -> List[ExecutionResult]:
+        results: List[ExecutionResult] = []
+        for test in test_cases:
+            stdout, stderr = self.executor.execute(
+                command,
+                test.input_data,
+                time_limit,
+            )
+            expected = test.expected_output or ""
+            results.append(
+                ExecutionResult(
+                    input_data=test.input_data,
+                    expected_output=test.expected_output,
+                    actual_output=stdout.strip(),
+                    passed=(
+                True if test.expected_output is None 
+                else stdout.strip() == expected.strip()
+                    ),
+                )
+            )
+        return results
+
+
+# online_judge\core\worker.py:
+"""
+Worker orchestrates compilation, execution and evaluation
+"""
+from online_judge.core.compiler import Compiler
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.core.test_runner import CaseRunner
+from online_judge.core.evaluator import Evaluator
+from online_judge.models.submission import Submission
+from online_judge.utils.file_ops import (
+    create_temp_dir,
+    write_code_file,
+    cleanup_dir,
+)
+class Worker:
+    """
+    Main execution pipeline.
+    """
+    def __init__(self) -> None:
+        self.compiler = Compiler()
+        self.executor = SandboxExecutor()
+        self.runner = CaseRunner(self.executor)
+        self.evaluator = Evaluator()
+    def process(self, submission: Submission) -> None:
+        """
+        Process a single submission.
+        """
+        temp_dir = create_temp_dir()
+        try:
+            source_file = write_code_file(
+                temp_dir, "solution.py", submission.code
+            )
+            self.compiler.compile(
+                source_file, submission.language,
+            )
+            results = self.runner.run(
+                command=submission.run_command(source_file),
+                test_cases=submission.test_cases,
+                time_limit=submission.time_limit,
+            )
+            self.evaluator.evaluate(results)
+            return results
+        finally:
+            cleanup_dir(temp_dir)
+
+
+# online_judge\exceptions\__init__.py:
+"""
+Exception hierarchy for Online Judge System.
+"""
+from .execution_errors import (
+    OnlineJudgeError,
+    CompilationError,
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+    MemoryLimitExceeded,
+    WrongAnswerError,
+)
+from .sandbox_errors import (
+    SandboxError,
+    SandboxViolationError,
+    ForbiddenOperationError,
+    SandboxTimeoutError,
+)
+__all__ = [
+    "OnlineJudgeError",
+    "CompilationError",
+    "RuntimeExecutionError",
+    "TimeLimitExceeded",
+    "MemoryLimitExceeded",
+    "WrongAnswerError",
+    "SandboxError",
+    "SandboxViolationError",
+    "ForbiddenOperationError",
+    "SandboxTimeoutError",
+]
+
+
+# online_judge\exceptions\execution_errors.py:
+"""
+Execution-related errors for Online Judge System.
+"""
+class OnlineJudgeError(Exception):
+    """
+    Base class for all Online Judge Errors.
+    """
+    pass
+class CompilationError(OnlineJudgeError):
+    """
+    Raised when user code fails to compile.
+    """
+    pass
+class RuntimeExecutionError(OnlineJudgeError):
+    """
+    Raised when runtime error occurs during execution.
+    """
+    pass
+class TimeLimitExceeded(OnlineJudgeError):
+    """
+    Raised when exectuon exceeds allowed time.
+    """
+    pass
+class MemoryLimitExceeded(OnlineJudgeError):
+    """
+    Raised when execution exceeds memory limit.
+    """
+    pass
+class WrongAnswerError(OnlineJudgeError):
+    """
+    Raised when execution exceeds memory limit.
+    """
+    pass
+
+
+# online_judge\exceptions\sandbox_errors.py:
+"""
+Sandbox and security related errors.
+"""
+class SandboxError(Exception):
+    """
+    Base class for sandbox-related errors.
+    """
+    pass
+class SandboxViolationError(SandboxError):
+    """
+    Raised when code attempts prohibited action.
+    """
+    pass
+class ForbiddenOperationError(SandboxViolationError):
+    """
+    Raised for forbidden system calls or file access.
+    """
+    pass
+class SandboxTimeoutError(SandboxError):
+    """
+    Raised when sandbox itself times out.
+    """
+    pass
+
+
+# online_judge\models\__init__.py:
+"""
+Domain models for Online Judge System.
+"""
+from .submission import Submission
+from .test_case import JudgeTestCase
+from .execution_result import ExecutionResult
+__all__ = [
+    "Submission",
+    "JudgeTestCase",
+    "ExecutionResult",
+]
+
+
+# online_judge\models\execution_result.py:
+"""
+Execution result model.
+"""
+from dataclasses import dataclass
+from typing import Optional
+@dataclass(frozen=True)
+class ExecutionResult:
+    """
+    Result of executing code against a test case.
+    """
+    passed: bool
+    actual_output: str
+    input_data: str
+    expected_output: str
+    execution_time: float = 0.0
+    memory_used_mb: int = 0
+    error: Optional[str] = None
+
+
+# online_judge\models\submission.py:
+"""
+Submission model.
+Represents a user-submitted solution.
+"""
+from dataclasses import dataclass, field
+from typing import Optional
+import uuid
+import time
+from typing import List
+from online_judge.models.test_case import JudgeTestCase
+@dataclass(frozen=True)
+class Submission:
+    """
+    Represents a code submission.
+    """
+    code: str
+    language: str
+    problem_id: str
+    test_cases: List[JudgeTestCase]
+    time_limit: int
+    submission_id: str = field(
+        default_factory=lambda: str(uuid.uuid4())
+    )
+    created_at: float = field(
+        default_factory=time.time
+    )
+    user_id: Optional[str] = None
+    def run_command(self, file_path: str) -> list[str]:
+        if self.language == "python":
+            return ["python", file_path]
+        raise ValueError(
+            f"Unsupported langauge: {self.language}"
+        )
+
+
+# online_judge\models\test_case.py:
+"""
+Test case model.
+"""
+from dataclasses import dataclass
+@dataclass(frozen=True)
+class JudgeTestCase:
+    """
+    Represents a single test case.
+    """
+    input_data: str
+    expected_output: str
+    time_limit_sec: int = 1
+    memory_limit_mb: int = 128
+
+
+# online_judge\storage\__init__.py:
+"""
+Persistence layer for Online Judge System.
+"""
+from .submissions import SubmissionStore
+from .results_db import ResultsDB
+__all__ = [
+    "SubmissionStore",
+    "ResultsDB",
+]
+
+
+# online_judge\storage\results_db.py:
+"""
+Execution results storage.
+"""
+from typing import Dict, List
+from online_judge.models.execution_result import ExecutionResult
+class ResultsDB:
+    """
+    In-memory storage for execution results.
+    """
+    def __init__(self) -> None:
+        self._results: Dict[str, List[ExecutionResult]] = {}
+    def save(
+        self,
+        submission_id: str,
+        result: ExecutionResult,
+    ) -> None:
+        """
+        Save result for a submission.
+        """
+        self._results.setdefault(
+            submission_id, []
+        ).append(result)
+    def get_results(
+            self,
+            submission_id: str,
+        ) -> List[ExecutionResult]:
+        """
+        Get all results for a submission.
+        """
+        return self._results.get(submission_id, [])
+    def clear(self) -> None:
+        """
+        Clear all stored results.
+        """
+        self._results.clear()
+
+
+# online_judge\storage\submissions.py:
+"""
+In-memory submission storage.
+"""
+from typing import Dict, List
+from online_judge.models.submission import Submission
+class SubmissionStore:
+    """
+    Simple in-memory submission store.
+    """
+    def __init__(self) -> None:
+        self._submissions: Dict[str, Submission] = {}
+    def save(self, submission: Submission) -> None:
+        """
+        Store a submission.
+        """
+        self._submissions[
+            submission.submission_id] = submission
+    def get(self, submission_id: str) -> Submission:
+        """
+        Retrieve a submission by ID.
+        """
+        return self._submissions[submission_id]
+    def list_all(self) -> List[Submission]:
+        """
+        List all submissions.
+        """
+        return list(self._submissions.values())
+
+
+# online_judge\utils\__init__.py:
+"""
+Utility helpers for Online Judge System.
+Includes:
+- File operations
+- Logging
+- Security & sandbox helpers
+"""
+from .file_ops import (
+    create_temp_dir,
+    write_code_file,
+    cleanup_dir,
+)
+from .logging import get_logger
+from .security import (
+    is_code_safe,
+    enforce_resource_limits,
+)
+__all__ = [
+    "create_temp_dir",
+    "write_code_file",
+    "cleanup_dir",
+    "get_logger",
+    "is_code_safe",
+    "enforce_resource_limits",
+]
+
+
+# online_judge\utils\file_ops.py:
+"""
+Filesystem utilities for Online Judge System.
+"""
+import os
+import shutil
+import tempfile
+from typing import Optional
+def create_temp_dir(prefix: str = "oj_") -> str:
+    """
+    Create a secure temporary directory for execution.
+    """
+    return tempfile.mkdtemp(prefix=prefix)
+def write_code_file(
+        directory: str,
+        filename: str,
+        code: str,
+        encoding: str = "utf-8",
+    ) -> str:
+    """
+    Write submitted code to a file inside a sandbox directory.
+    """
+    path = os.path.join(directory, filename)
+    with open(path, "w", encoding=encoding) as f:
+        f.write(code)
+    return path
+def cleanup_dir(path: str) -> None:
+    """
+    Safely remove a directory and all its contents.
+    """
+    if path and os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+
+
+# online_judge\utils\logging.py:
+"""
+Logging utilities for Online Judge System.
+"""
+import logging
+import os
+from typing import Dict
+from config.config import LOG_DIR, LOG_FILE
+_LOGGERS: Dict[str, logging.Logger] = {}
+def get_logger(name: str) -> logging.Logger:
+    """
+    Get or create a configured logger instance.
+    """
+    if name in _LOGGERS:
+        return _LOGGERS[name]
+    os.makedirs(LOG_DIR, exist_ok=True)
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
+    )
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    file_handler = logging.FileHandler(LOG_FILE)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    _LOGGERS[name] = logger
+    return logger
+
+
+# online_judge\utils\security.py:
+"""
+Security helpers for Online Judge System.
+⚠️ NOTE:
+This is a *baseline* implementation.
+A real production judge must be OS-level sandboxing
+(e.g., Docker, seccomp, namespaces).
+"""
+import ast
+from typing import List
+try:
+    import resource
+except ImportError:
+    resource = None
+    import warnings
+BLOCKED_IMPORTS: List[str] = [
+    "os",
+    "sys",
+    "subprocess",
+    "socket",
+    "shutil",
+    "pathlib",
+    "resource",
+]
+def is_code_safe(code: str) -> bool:
+    """
+    Perform static analysis to reject obviously dangerous code.
+    """
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if (alias.name.split(".")[0] 
+                    in BLOCKED_IMPORTS):
+                    return False
+        elif isinstance(node, ast.ImportFrom):
+            if node.module and (node.module.split(".")
+                                in BLOCKED_IMPORTS):
+                return False
+    return True
+def enforce_resource_limits(
+        cpu_seconds: int,
+        memory_mb: int,
+    ) -> None:
+    """
+    Apply OS-level resource limits (Unix only).
+    No-op on Windows.
+    """
+    if resource is None:
+        warnings.warn(
+            "OS-level resource limits are not supported "
+            "on this platform (Windows). Execution is "
+            "not fully sandboxed.",
+            RuntimeWarning
+        )
+        return                                  
+    resource.setrlimit(
+        resource.RLIMIT_CPU,
+        (cpu_seconds, cpu_seconds),
+    )
+    memory_bytes = memory_mb * 1024 * 1024
+    resource.setrlimit(
+        resource.RLIMIT_AS,
+        (memory_bytes, memory_bytes),
+    )
+
+
+# tests\__init__.py:
+"""
+Test package for Online Judge System.
+"""
+
+
+# tests\test_compiler.py:
+import pytest
+from online_judge.core.compiler import Compiler
+from online_judge.exceptions.execution_errors import CompilationError
+def test_python_compiler_success(tmp_path):
+    code = "print('hello')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    compiler = Compiler()
+    compiler.compile(str(file_path), "python") 
+def test_python_compiler_syntax_error(tmp_path):
+    code = "print("
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    compiler = Compiler()
+    with pytest.raises(CompilationError):
+        compiler.compile(str(file_path), "python")
+def test_unsupported_language(tmp_path):
+    code = "int main() {}"
+    file_path = tmp_path / "solution.c"
+    file_path.write_text(code)
+    compiler = Compiler()
+    with pytest.raises(CompilationError):
+        compiler.compile(str(file_path), "c")
+
+
+# tests\test_evaluator.py:
+import pytest
+from online_judge.core.evaluator import Evaluator
+from online_judge.models.execution_result import ExecutionResult
+from online_judge.exceptions.execution_errors import WrongAnswerError
+def test_evaluator_all_passed():
+    results = [
+        ExecutionResult(
+            passed=True,
+            actual_output="4",
+            expected_output="4",
+            input_data="2",
+        )
+    ]
+    evaluator = Evaluator()
+    evaluator.evaluate(results)                   
+def test_evaluator_wrong_answer():
+    results = [
+        ExecutionResult(
+            passed=False,
+            actual_output="3",
+            expected_output="4",
+            input_data="2",
+        )
+    ]
+    evaluator = Evaluator()
+    with pytest.raises(WrongAnswerError):
+        evaluator.evaluate(results)
+
+
+# tests\test_sandbox_executor.py:
+import pytest
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.exceptions.execution_errors import (
+    RuntimeExecutionError,
+    TimeLimitExceeded,
+)
+def test_sandbox_executor_success(tmp_path):
+    code = "print('ok')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    executor = SandboxExecutor()
+    stdout, stderr = executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=2,
+    )
+    assert stdout.strip() == "ok"
+    assert stderr == ""
+def test_sandbox_executor_runtime_error(tmp_path):
+    code = "raise ValueError('boom')"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    executor = SandboxExecutor()
+    with pytest.raises(RuntimeExecutionError):
+        executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=2,
+    )
+def test_sandbox_executor_timeout(tmp_path):
+    code = "while True: pass"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    executor = SandboxExecutor()
+    with pytest.raises(TimeLimitExceeded):
+        executor.execute(
+        command=["python", str(file_path)],
+        input_data="",
+        time_limit=1,
+    )
+
+
+# tests\test_test_runner.py:
+import pytest
+from online_judge.core.test_runner import CaseRunner
+from online_judge.core.sandbox_executor import SandboxExecutor
+from online_judge.models.test_case import JudgeTestCase
+def test_test_runner_single_case(tmp_path):
+    code = "print(input())"
+    file_path = tmp_path / "solution.py"
+    file_path.write_text(code)
+    executor = SandboxExecutor()
+    runner = CaseRunner(executor)
+    test_cases = [
+        JudgeTestCase(
+            input_data="hello",
+            expected_output="hello",
+        )
+    ]
+    results = runner.run(
+        command=["python", str(file_path)],
+        test_cases=test_cases,
+        time_limit=2,
+    )
+    assert len(results) == 1
+    assert results[0].passed is True
+    assert results[0].actual_output == "hello"
+
+

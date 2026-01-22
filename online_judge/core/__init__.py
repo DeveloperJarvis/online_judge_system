@@ -30,8 +30,23 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Core execution engine for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .compiler import Compiler
+from .sandbox_executor import SandboxExecutor
+from .test_runner import CaseRunner
+from .evaluator import Evaluator
+from .worker import Worker
 
+
+__all__ = [
+    "Compiler",
+    "SandboxExecutor",
+    "CaseRunner",
+    "Evaluator",
+    "Worker",
+]

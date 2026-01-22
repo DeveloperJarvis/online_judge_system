@@ -30,8 +30,33 @@
 # --------------------------------------------------
 # evaluator MODULE
 # --------------------------------------------------
-
+"""
+Evaluates test execution results.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import List
+from online_judge.models.execution_result import ExecutionResult
+from online_judge.exceptions.execution_errors import WrongAnswerError
 
+
+# --------------------------------------------------
+# evaluator
+# --------------------------------------------------
+class Evaluator:
+    """
+    Evaluates correctness of outputs.
+    """
+
+    def evaluate(self, 
+                 results: List[ExecutionResult]) -> None:
+        """
+        Raise error if any test fails.
+        """
+        for result in results:
+            if not result.passed:
+                raise WrongAnswerError(
+                    f"Expected: {result.expected_output}, "
+                    f"Got: {result.actual_output}"
+                )

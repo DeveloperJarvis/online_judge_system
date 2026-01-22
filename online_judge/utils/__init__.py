@@ -30,8 +30,34 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
+"""
+Utility helpers for Online Judge System.
 
+Includes:
+- File operations
+- Logging
+- Security & sandbox helpers
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .file_ops import (
+    create_temp_dir,
+    write_code_file,
+    cleanup_dir,
+)
+from .logging import get_logger
+from .security import (
+    is_code_safe,
+    enforce_resource_limits,
+)
 
+
+__all__ = [
+    "create_temp_dir",
+    "write_code_file",
+    "cleanup_dir",
+    "get_logger",
+    "is_code_safe",
+    "enforce_resource_limits",
+]

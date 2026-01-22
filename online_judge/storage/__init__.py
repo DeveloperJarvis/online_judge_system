@@ -30,8 +30,17 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Persistence layer for Online Judge System.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .submissions import SubmissionStore
+from .results_db import ResultsDB
 
+
+__all__ = [
+    "SubmissionStore",
+    "ResultsDB",
+]
